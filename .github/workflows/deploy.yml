@@ -8,7 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,10 +47,12 @@ jobs:
           cd out
           zip -rq ../site.zip .
           cd ..
+          du -h site.zip
 
       - name: Upload site.zip over FTP
         run: |
           curl --fail --silent --show-error \
+            --connect-timeout 30 --max-time 900 --retry 2 --retry-delay 10 \
             --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
             -T site.zip \
             "ftp://${{ secrets.FTP_SERVER }}/site.zip"
