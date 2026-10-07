@@ -1,0 +1,7 @@
+{
+  "id": "lt-avtomobilnyy",
+  "slug": "avtomobilnyy",
+  "name": "Автомобильный",
+  "description": "Замки дверей и замка зажигания автомобиля, включая иммобилайзер.",
+  "isIndexable": false
+}

@@ -1,0 +1,7 @@
+{
+  "id": "lt-elektromehanicheskiy",
+  "slug": "elektromehanicheskiy",
+  "name": "Электромеханический",
+  "description": "Сочетает механический запорный узел с электроприводом или электронным управлением.",
+  "isIndexable": false
+}

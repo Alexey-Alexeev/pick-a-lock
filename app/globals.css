@@ -1,26 +1,268 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Pick·a·lock base system — "Чертёж, не отмычка": graphite + brass + technical cyan.
+     Dark canvas site-wide (not just accent sections) — see design-system spec. */
+  --ink: #0b0d10;
+  --ink-elevated: #0f1216;
+  --ink-foreground: #e8e6e1;
+  --ink-foreground-muted: rgba(232, 230, 225, 0.78);
+  --ink-border: rgba(232, 230, 225, 0.12);
+
+  --paper: #0b0d10;
+  --surface: #0f1216;
+  --surface-sunken: #1b2027;
+  --foreground: #e8e6e1;
+  --muted: rgba(232, 230, 225, 0.78);
+  --border: rgba(232, 230, 225, 0.12);
+
+  --accent: #c9a227;
+  --accent-ink: #e3be48;
+  --accent-foreground: #0b0d10;
+
+  --cyan: #6fd3e0;
+
+  --font-display: var(--font-unbounded);
+  --font-body: var(--font-golos);
+  --font-mono: var(--font-ibm-plex-mono);
+
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+
+  --space-section: clamp(4rem, 9vw, 8rem);
+  --space-block: clamp(2.5rem, 5vw, 4.5rem);
+  --space-content: clamp(1.25rem, 3vw, 2rem);
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-ink: var(--ink);
+  --color-ink-elevated: var(--ink-elevated);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-foreground-muted: var(--ink-foreground-muted);
+  --color-ink-border: var(--ink-border);
+
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-cyan: var(--cyan);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+
+  /* Bumped ~10-15% over Tailwind's default type scale — the base set read too small. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.625rem;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.3125rem;
+  --text-xl--line-height: 1.875rem;
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: 2.125rem;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 2.375rem;
+  --text-4xl: 2.5rem;
+  --text-4xl--line-height: 2.625rem;
+  --text-5xl: 3.25rem;
+  --text-5xl--line-height: 1.1;
+  --text-6xl: 4rem;
+  --text-6xl--line-height: 1.1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--foreground);
+    font-family: var(--font-body), Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Default link color — any component that needs a different color on an
+     <a>/Link (e.g. text-accent-foreground on a filled button) overrides this
+     via a Tailwind utility class, which — being in Tailwind's own layer —
+     still wins on specificity within the same layer. */
+  a {
+    color: var(--accent);
+  }
+  a:hover {
+    color: var(--accent-ink);
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-foreground);
   }
 }
 
-body {
-  background: var(--background);
+@keyframes pl-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rise {
+    opacity: 0;
+    animation: hero-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--hero-rise-delay, 0ms);
+  }
+}
+
+/* Scroll-triggered reveal — a section gets `is-in` added (via IntersectionObserver) once it
+   enters the viewport; its `.rise` children then fade/rise/unblur in, staggered by --d. */
+.rise {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(14px);
+}
+.is-in .rise {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .is-in .rise {
+    transition:
+      opacity 900ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms),
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms),
+      filter 900ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
+  }
+}
+
+/* Process stepper — a JS state machine (see Process.tsx) drives a gold line that travels
+   step to step on a loop: the connector fills, then the next circle lights up, its text
+   brightens, and the previous step settles back down. Classes are toggled directly by React
+   state rather than a one-shot `.is-in` parent, since this animation repeats. */
+.step-connector,
+.step-connector--vertical {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.step-connector--vertical {
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.step-connector.is-filled {
+  transform: scaleX(1);
+}
+.step-connector--vertical.is-filled {
+  transform: scaleY(1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .step-connector,
+  .step-connector--vertical {
+    transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.step-fill {
+  clip-path: circle(0% at 50% 50%);
+}
+.step-fill.is-filled {
+  clip-path: circle(75% at 50% 50%);
+}
+.step-number {
+  position: relative;
+  z-index: 1;
+  color: var(--muted);
+}
+.step-number.is-filled {
+  color: var(--ink);
+}
+.step-circle {
+  box-shadow: 0 1px 0 0 rgba(227, 190, 72, 0);
+}
+.step-circle.is-active {
+  box-shadow: 0 1px 2px 0 rgba(11, 13, 16, 0.4);
+}
+.step-text {
+  color: var(--muted);
+}
+.step-text.is-active {
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .step-fill {
+    transition: clip-path 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .step-number {
+    transition: color 350ms ease-out;
+  }
+  .step-circle {
+    transition: box-shadow 500ms ease-out;
+  }
+  .step-text {
+    transition: color 500ms ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .step-fill.is-filled {
+    clip-path: circle(75% at 50% 50%);
+  }
+}
+
+@keyframes hero-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 10px rgba(227, 190, 72, 0.35),
+      0 0 24px rgba(227, 190, 72, 0.15);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(227, 190, 72, 0.7),
+      0 0 42px rgba(227, 190, 72, 0.35);
+  }
+}
+
+.hero-glow {
+  text-shadow:
+    0 0 14px rgba(227, 190, 72, 0.45),
+    0 0 30px rgba(227, 190, 72, 0.2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-glow {
+    animation: hero-glow 2600ms cubic-bezier(0.22, 1, 0.36, 1) 1100ms infinite;
+  }
 }
