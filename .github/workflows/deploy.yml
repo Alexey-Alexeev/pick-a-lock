@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,20 +37,20 @@ jobs:
           NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}
           NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
 
-      - name: Deploy over FTP to Jino
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+      # Plain FTP and explicit FTPS both failed at the connection level (AggregateError on the
+      # control socket, then a hang on FTPS) — switched to SFTP on port 2222, which Jino's panel
+      # also lists as supported. sftp_only forces pure SFTP file transfer instead of this action's
+      # default rsync-over-ssh mode, which needs an rsync binary on the remote that shared hosting
+      # like this generally doesn't have.
+      - name: Deploy over SFTP to Jino
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
         with:
           server: ${{ secrets.FTP_SERVER }}
+          port: 2222
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./out/
-          # Relative to the FTP account's own root (shown as "/" in Jino's FTP panel), which is
-          # the same root the "Домашняя папка" column in Jino's domain list is shown from.
-          server-dir: ./domains/pick-a-lock.ru/
-          # lead-config.php holds the Telegram bot secrets and is uploaded manually, once, over
-          # FTP — it must never be touched by this workflow (it isn't in the repo to begin with,
-          # but this is a second line of defense).
-          exclude: |
-            **/.git*
-            **/lead-config.php
+          sftp_only: true
+          local_path: "./out/*"
+          # Relative to the account's own root (shown as "/" in Jino's FTP panel), which is the
+          # same root the "Домашняя папка" column in Jino's domain list is shown from.
+          remote_path: "./domains/pick-a-lock.ru/"
