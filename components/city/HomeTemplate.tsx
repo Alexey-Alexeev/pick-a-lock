@@ -12,11 +12,6 @@ import { CallMasterForm } from "@/components/design-system/CallMasterForm";
 import { CTA } from "@/components/design-system/CTA";
 import { HeroPadlockVideo } from "@/components/design-system/HeroPadlockVideo";
 import { TypewriterLine } from "@/components/design-system/TypewriterLine";
-import { getLocalizedServiceName } from "@/lib/textRotation";
-
-function getLocalizedServices(city: City, services: Service[]): Service[] {
-  return services.map((service) => ({ ...service, shortName: getLocalizedServiceName(city.slug, service) }));
-}
 
 function getProcessSteps(city: City) {
   return [
@@ -991,7 +986,7 @@ export function HomeTemplate({ city, heroLocation }: HomeTemplateProps) {
       <section className="mx-auto max-w-[1400px] px-6 py-20 sm:px-10">
         <TechnicalLabel as="h2">Услуги в {city.prepositionalName}</TechnicalLabel>
         <div className="mt-6">
-          <ServiceList services={getLocalizedServices(city, services)} city={city} />
+          <ServiceList services={services} city={city} />
         </div>
       </section>
 

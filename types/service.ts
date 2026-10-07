@@ -17,6 +17,12 @@ export const serviceSchema = z.object({
   category: z.enum(["vskrytie", "zamena", "ustanovka", "remont", "izvlechenie", "perekodirovka"]),
   objectTypes: z.array(z.string()),
   description: z.string(),
+  /** Tail of the page Title after "{name} в {city}" — a short benefit or scope, not a keyword dump.
+   *  Dropped automatically when the assembled Title would run long (see buildCityServicePage). */
+  titleSuffix: z.string().optional(),
+  /** Purpose-written meta description, 140–160 chars once the city token is interpolated. Exists
+   *  because truncating `description` to a fixed length cuts mid-word in the SERP snippet. */
+  metaDescription: z.string().optional(),
   whenNeeded: z.array(z.string()),
   includes: z.array(z.string()),
   processSteps: z.array(z.string()),

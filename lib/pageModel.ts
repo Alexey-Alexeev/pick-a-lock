@@ -15,7 +15,8 @@ import {
 } from "@/lib/content";
 import { cityTemplateVars, interpolate, interpolateAll } from "@/lib/templating";
 import { shouldIndexCityService } from "@/lib/seo/should-index";
-import { getLocalizedServiceName, getLocalizedServiceIntro } from "@/lib/textRotation";
+import { clampMeta } from "@/lib/seo/metadata";
+import { getLocalizedServiceIntro } from "@/lib/textRotation";
 import { SERVICE_FAQ_VARIANTS } from "@/lib/serviceFaqVariants";
 import type { BreadcrumbItem } from "@/components/design-system/Breadcrumbs";
 
@@ -69,23 +70,36 @@ function getLocalizedServiceFaq(
   });
 }
 
+/** Past this the SERP truncates, so an over-long Title just loses its tail. */
+const TITLE_MAX = 70;
+
 export function buildCityServicePage(city: City, service: Service): CityServicePageModel {
   const vars = cityTemplateVars(city);
   const decision = shouldIndexCityService(city, service);
   const price = getPriceForCity(city, service);
-  const displayName = getLocalizedServiceName(city.slug, service);
+
+  // The service's own name, never a rotated synonym. Picking a per-city variant here used to put
+  // the head term out of the Title and H1 on most pages — "Установка замков" survived in only 7
+  // cities out of 70, and Moscow's install page was headed "Врезка ночной задвижки". The variants
+  // still exist in SERVICE_NAME_VARIANTS; they belong in section headings inside the page, where
+  // they add long-tail reach without costing the term the page is actually competing for.
+  const displayName = service.name;
 
   const h1 = city.custom?.h1
     ? interpolate(city.custom.h1, vars)
     : `${displayName} в ${city.prepositionalName}`;
 
+  const baseTitle = `${displayName} в ${city.prepositionalName}`;
+  const suffix = service.titleSuffix;
   const title =
     city.custom?.title ??
-    `${displayName} в ${city.prepositionalName}${price ? ` — цена от ${price} ₽` : ""}`;
+    (suffix && baseTitle.length + 3 + suffix.length <= TITLE_MAX
+      ? `${baseTitle} — ${suffix}`
+      : baseTitle);
 
   const description =
     city.custom?.description ??
-    interpolate(service.description, vars).slice(0, 155);
+    clampMeta(interpolate(service.metaDescription ?? service.description, vars));
 
   const serviceIntro = city.custom?.serviceIntros?.[service.slug];
   const intro = serviceIntro ? interpolate(serviceIntro, vars) : getLocalizedServiceIntro(city.slug, service, vars);
@@ -164,7 +178,7 @@ export function buildLockTypePage(lockType: LockType): InfoPageModel {
     name: lockType.name,
     indexable: lockType.isIndexable,
     title: `${lockType.h1 ?? `Вскрытие ${lockType.name.toLowerCase()}`} в Москве и области`,
-    description: lockType.description.slice(0, 155),
+    description: clampMeta(lockType.description),
     h1: lockType.h1 ?? `Вскрытие ${lockType.name.toLowerCase()}`,
     tagline: lockType.tagline,
     intro: lockType.description,
@@ -201,7 +215,7 @@ export function buildBrandPage(brand: Brand): InfoPageModel {
     name: brand.name,
     indexable: brand.isIndexable,
     title: `${brand.h1 ?? `Вскрытие замков ${brand.name}`} в Москве и области`,
-    description: brand.description.slice(0, 155),
+    description: clampMeta(brand.description),
     h1: brand.h1 ?? `Вскрытие замков ${brand.name}`,
     tagline: brand.tagline,
     intro: brand.description,

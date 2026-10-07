@@ -13,9 +13,15 @@ export function pickVariant<T>(variants: T[], key: string): T {
 }
 
 /**
- * Alternate, more specific phrasings for a service name — rotated per city so the same
- * service doesn't read byte-for-byte identical on every one of the 21 city pages (and on the
- * city's own service list). Services not listed here keep their plain content name.
+ * Narrower phrasings of each service — "Врезка замка в железную дверь" under "Установка замков".
+ *
+ * These were previously rotated per city to fill the Title and H1, which cost far more than the
+ * duplication it avoided: the head term survived in only a fraction of cities (7 of 70 for
+ * установка), and Moscow's install page was headed "Врезка ночной задвижки". A city page has to
+ * win its own head term first; uniqueness comes from the per-city intro, price and geography.
+ *
+ * They stay here as the raw material for in-page section headings (one H2 per variant, with a
+ * couple of sentences under each), which reaches the same long tail without the cost.
  */
 export const SERVICE_NAME_VARIANTS: Record<string, string[]> = {
   "vskrytie-zamkov": [
@@ -93,12 +99,6 @@ export const SERVICE_NAME_VARIANTS: Record<string, string[]> = {
     "Перенастройка замка под новый ключ",
   ],
 };
-
-export function getLocalizedServiceName(citySlug: string, service: { slug: string; name: string }): string {
-  const variants = SERVICE_NAME_VARIANTS[service.slug];
-  if (!variants) return service.name;
-  return pickVariant(variants, `${citySlug}:${service.slug}`);
-}
 
 /**
  * Alternate hero-intro wordings for a service — rotated per city so the city+service page

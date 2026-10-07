@@ -26,6 +26,34 @@ function ListBlock({ label, items }: { label: string; items: string[] }) {
   );
 }
 
+/**
+ * A row of related terms. Lock types and brands have their own pages, so they are links — the
+ * relationship is already computed here and was being thrown away as plain text. Terms without a
+ * page (object types, stub lock types) render as plain text in the same row, so the row reads
+ * consistently either way. Separated by spacing rather than a "·", per the project design rules.
+ */
+function TermList({ items }: { items: { key: string; name: string; href?: string }[] }) {
+  if (items.length === 0) return null;
+  return (
+    <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm leading-relaxed text-foreground sm:text-[16px]">
+      {items.map((item) => (
+        <li key={item.key}>
+          {item.href ? (
+            <Link
+              href={item.href}
+              className="text-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent-ink hover:decoration-accent-ink"
+            >
+              {item.name}
+            </Link>
+          ) : (
+            item.name
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function CityServiceTemplate({ model }: { model: CityServicePageModel }) {
   const { city, service } = model;
   const cities = getActiveCities().map((c) => ({ slug: c.slug, name: c.name }));
@@ -33,12 +61,14 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
   const lockTypesBySlug = new Map(getAllLockTypes().map((lt) => [lt.slug, lt]));
   const relevantLockTypes = (service.relatedLockTypeSlugs ?? [])
     .map((slug) => lockTypesBySlug.get(slug))
-    .filter(Boolean);
+    .filter((lt) => lt != null);
   const brandsBySlug = new Map(getAllBrands().map((b) => [b.slug, b]));
   const relevantBrandSlugs = Array.from(
-    new Set(relevantLockTypes.flatMap((lt) => lt!.relatedBrandSlugs ?? []))
+    new Set(relevantLockTypes.flatMap((lt) => lt.relatedBrandSlugs ?? []))
   );
-  const relevantBrands = relevantBrandSlugs.map((slug) => brandsBySlug.get(slug)).filter(Boolean);
+  const relevantBrands = relevantBrandSlugs
+    .map((slug) => brandsBySlug.get(slug))
+    .filter((b) => b != null);
 
   return (
     <div>
@@ -96,9 +126,15 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
             {relevantLockTypes.length > 0 && (
               <div>
                 <TechnicalLabel as="h2">Типы замков</TechnicalLabel>
-                <p className="mt-4 text-sm leading-relaxed text-foreground sm:text-[16px]">
-                  {relevantLockTypes.map((lt) => lt!.name).join(" · ")}
-                </p>
+                <TermList
+                  items={relevantLockTypes.map((lt) => ({
+                    key: lt.slug,
+                    name: lt.name,
+                    // Stub lock types are noindex and near-empty — naming them is useful, linking
+                    // to them is not, so those render as plain text.
+                    href: lt.isIndexable ? `/zamki/${lt.slug}/` : undefined,
+                  }))}
+                />
                 {city.custom?.lockTypesIntro && (
                   <p className="mt-3 text-sm leading-relaxed text-muted sm:text-[16px]">{city.custom.lockTypesIntro}</p>
                 )}
@@ -107,9 +143,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
             {service.objectTypes.length > 0 && (
               <div>
                 <TechnicalLabel as="h2">Выезжаем на объекты</TechnicalLabel>
-                <p className="mt-4 text-sm leading-relaxed text-foreground sm:text-[16px]">
-                  {service.objectTypes.join(" · ")}
-                </p>
+                <TermList items={service.objectTypes.map((name) => ({ key: name, name }))} />
               </div>
             )}
           </section>
@@ -118,9 +152,13 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
         {relevantBrands.length > 0 && (
           <section className="border-t border-border py-16 sm:py-20">
             <TechnicalLabel as="h2">Бренды</TechnicalLabel>
-            <p className="mt-4 text-sm leading-relaxed text-foreground sm:text-[16px]">
-              {relevantBrands.map((b) => b!.name).join(" · ")}
-            </p>
+            <TermList
+              items={relevantBrands.map((b) => ({
+                key: b.slug,
+                name: b.name,
+                href: b.isIndexable ? `/brendy/${b.slug}/` : undefined,
+              }))}
+            />
             {city.custom?.brandsIntro && (
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-[16px]">{city.custom.brandsIntro}</p>
             )}
