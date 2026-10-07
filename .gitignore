@@ -37,6 +37,12 @@ yarn-error.log*
 # lead.php secrets — uploaded manually over FTP, never through CI (see lead-config.example.php)
 /public/lead-config.php
 
+# deploy-unzip.php secrets — uploaded manually over FTP, never through CI (see deploy-config.example.php)
+/public/deploy-config.php
+
+# the deploy workflow's own build artifact, zipped up for a single fast FTP upload
+/site.zip
+
 # build-time generated, not source
 /public/data/lead-meta.json
 

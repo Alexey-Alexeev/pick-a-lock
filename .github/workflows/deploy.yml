@@ -37,24 +37,25 @@ jobs:
           NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}
           NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
 
-      # SFTP (port 2222) needs Jino's paid "Поддержка SSH" add-on, which isn't enabled — every
-      # attempt timed out with nothing listening. Back to plain FTP: the original attempt failed
-      # with "AggregateError (control socket)", but that was against the hostname, which resolves
-      # to both an IPv6 and IPv4 address — the same dual-stack issue that broke SFTP until
-      # FTP_SERVER was switched to the IPv4 literal. Worth a clean retry now that it's fixed.
-      - name: Deploy over FTP to Jino
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./out/
-          # zamkisochi_pickalock's own home folder is already /domains/pick-a-lock.ru — no
-          # subpath needed.
-          server-dir: ./
-          # lead-config.php holds the Telegram bot secrets and is uploaded manually, once, over
-          # FTP — it must never be touched by this workflow (it isn't in the repo to begin with,
-          # but this is a second line of defense).
-          exclude: |
-            **/.git*
-            **/lead-config.php
+      # Plain FTP does connect, but the site is ~900 files/folders (70 cities × ~12 services) and
+      # FTP uploads one at a time over a single connection — it was still running past the
+      # 10-minute job timeout. Instead: zip the build, upload that ONE file, then ask a small PHP
+      # script already on the server to extract it in place. See public/deploy-unzip.php and
+      # public/deploy-config.example.php for the one-time manual bootstrap this needs.
+      - name: Package static export
+        run: |
+          cd out
+          zip -rq ../site.zip .
+          cd ..
+
+      - name: Upload site.zip over FTP
+        run: |
+          curl --fail --silent --show-error \
+            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+            -T site.zip \
+            "ftp://${{ secrets.FTP_SERVER }}/site.zip"
+
+      - name: Trigger server-side extraction
+        run: |
+          curl --fail --silent --show-error --max-time 300 \
+            "https://pick-a-lock.ru/deploy-unzip.php?token=${{ secrets.DEPLOY_TOKEN }}"
