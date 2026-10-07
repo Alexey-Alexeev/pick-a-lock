@@ -25,8 +25,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # Internal design-system comparison page only — hits an unrelated Turbopack production-build
-      # bug resolving next/font/google. Never shipped; dropped before build rather than fixed.
+      # Internal design-system comparison page — a review tool, not part of the real site, so it's
+      # never shipped to the live domain.
       - name: Remove internal dev-only route
         run: rm -rf "app/(dev)"
 
