@@ -42,6 +42,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
           local-dir: ./out/
           # Relative to the FTP account's own root (shown as "/" in Jino's FTP panel), which is
           # the same root the "Домашняя папка" column in Jino's domain list is shown from.
