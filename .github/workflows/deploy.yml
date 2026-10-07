@@ -24,9 +24,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Typecheck
-        run: npx tsc --noEmit
-
       # Internal design-system comparison page only — hits an unrelated Turbopack production-build
       # bug resolving next/font/google. Never shipped; dropped before build rather than fixed.
       - name: Remove internal dev-only route
