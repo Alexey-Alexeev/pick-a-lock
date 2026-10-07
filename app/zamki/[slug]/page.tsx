@@ -7,7 +7,6 @@ import { InfoPageTemplate } from "@/components/design-system/InfoPageTemplate";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { localBusinessSchema, faqPageSchema } from "@/components/seo/schema";
 
-export const revalidate = 86400;
 
 interface PageParams {
   slug: string;

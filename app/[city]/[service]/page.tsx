@@ -7,7 +7,6 @@ import { CityServiceTemplate } from "@/components/city/CityServiceTemplate";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { localBusinessSchema, serviceSchema as serviceSchemaLd, faqPageSchema } from "@/components/seo/schema";
 
-export const revalidate = 86400;
 
 interface PageParams {
   city: string;

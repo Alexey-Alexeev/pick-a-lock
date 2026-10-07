@@ -9,6 +9,8 @@ import {
 import { shouldIndexCity, shouldIndexCityService } from "@/lib/seo/should-index";
 import { SITE_URL } from "@/lib/seo/site";
 
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   // Content here is generated from static JSON at build time, so "last modified" for anything
   // without its own tracked date is honestly just "as of this build" — the build timestamp.

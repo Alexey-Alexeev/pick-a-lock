@@ -12,8 +12,10 @@ export const jetbrainsMonoCombo = JetBrains_Mono({ variable: "--font-combo-b-mon
 
 // Combo C — Spectral + Geist + Geist Mono: contemporary, architectural serif
 export const spectral = Spectral({ variable: "--font-combo-c-display", subsets: ["latin", "cyrillic"], weight: ["600", "700"] });
-export const geistCombo = Geist({ variable: "--font-combo-c-body", subsets: ["latin", "cyrillic"], weight: ["400", "500"] });
-export const geistMonoCombo = Geist_Mono({ variable: "--font-combo-c-mono", subsets: ["latin", "cyrillic"], weight: ["400", "500"] });
+// Geist / Geist Mono ship no Cyrillic subset on Google Fonts — requesting one breaks the font
+// resolver entirely, so this combo is latin-only (fine: it's just an internal comparison preview).
+export const geistCombo = Geist({ variable: "--font-combo-c-body", subsets: ["latin"], weight: ["400", "500"] });
+export const geistMonoCombo = Geist_Mono({ variable: "--font-combo-c-mono", subsets: ["latin"], weight: ["400", "500"] });
 
 export const ALL_COMPARISON_FONT_VARIABLES = [
   playfairDisplay.variable,

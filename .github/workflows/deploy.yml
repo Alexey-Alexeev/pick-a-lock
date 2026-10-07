@@ -1,0 +1,57 @@
+name: Deploy to Jino
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # Internal design-system comparison page only — hits an unrelated Turbopack production-build
+      # bug resolving next/font/google. Never shipped; dropped before build rather than fixed.
+      - name: Remove internal dev-only route
+        run: rm -rf "app/(dev)"
+
+      - name: Build static export
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://pick-a-lock.ru
+          NEXT_PUBLIC_YANDEX_METRIKA_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_METRIKA_ID }}
+          NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
+
+      - name: Deploy over FTP to Jino
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./out/
+          # Relative to the FTP account's own root (shown as "/" in Jino's FTP panel), which is
+          # the same root the "Домашняя папка" column in Jino's domain list is shown from.
+          server-dir: ./domains/pick-a-lock.ru/
+          # lead-config.php holds the Telegram bot secrets and is uploaded manually, once, over
+          # FTP — it must never be touched by this workflow (it isn't in the repo to begin with,
+          # but this is a second line of defense).
+          exclude: |
+            **/.git*
+            **/lead-config.php
