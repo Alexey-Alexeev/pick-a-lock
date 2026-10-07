@@ -37,6 +37,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# AI agent/skill tooling (local dev tools, not part of the shipped app)
+/.claude/
+/.agents/
+/agent/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
