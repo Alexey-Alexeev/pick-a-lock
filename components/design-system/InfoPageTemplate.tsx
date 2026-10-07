@@ -16,7 +16,7 @@ function ListBlock({ label, items }: { label: string; items: string[] }) {
   if (items.length === 0) return null;
   return (
     <div>
-      <TechnicalLabel>{label}</TechnicalLabel>
+      <TechnicalLabel as="h2">{label}</TechnicalLabel>
       <ul className="mt-4 flex flex-col">
         {items.map((item, i) => (
           <li
@@ -78,7 +78,7 @@ export function InfoPageTemplate({ model }: { model: InfoPageModel }) {
 
         {model.processSteps.length > 0 && (
           <section className="border-t border-border py-16 sm:py-20">
-            <TechnicalLabel>Как проходит работа</TechnicalLabel>
+            <TechnicalLabel as="h2">Как проходит работа</TechnicalLabel>
             <div className="mt-6">
               <Process steps={model.processSteps.map((description) => ({ description }))} />
             </div>
@@ -103,7 +103,7 @@ export function InfoPageTemplate({ model }: { model: InfoPageModel }) {
 
         {model.faq.length > 0 && (
           <section className="border-t border-border py-16 sm:py-20">
-            <TechnicalLabel>Частые вопросы</TechnicalLabel>
+            <TechnicalLabel as="h2">Частые вопросы</TechnicalLabel>
             <div className="mt-6 max-w-2xl">
               <FaqDisclosure items={model.faq} />
             </div>
@@ -112,7 +112,7 @@ export function InfoPageTemplate({ model }: { model: InfoPageModel }) {
 
         {model.otherBrands && model.otherBrands.length > 0 && (
           <section className="border-t border-border py-16 sm:py-20">
-            <TechnicalLabel>Работаем и с другими брендами</TechnicalLabel>
+            <TechnicalLabel as="h2">Работаем и с другими брендами</TechnicalLabel>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-[16px]">
               {model.name} — не единственный бренд, с которым мы работаем. Среди прочих:
             </p>
@@ -134,13 +134,13 @@ export function InfoPageTemplate({ model }: { model: InfoPageModel }) {
           <section className="grid grid-cols-1 gap-10 border-t border-border py-16 sm:py-20 lg:grid-cols-2 lg:gap-16">
             {model.relatedServices.length > 0 && (
               <div>
-                <TechnicalLabel>{model.relatedLabel}</TechnicalLabel>
+                <TechnicalLabel as="h2">{model.relatedLabel}</TechnicalLabel>
                 <PersonalizedServiceLinks services={model.relatedServices} cities={cities} />
               </div>
             )}
             {model.relatedSecondary.length > 0 && (
               <div>
-                <TechnicalLabel>{model.relatedSecondaryLabel}</TechnicalLabel>
+                <TechnicalLabel as="h2">{model.relatedSecondaryLabel}</TechnicalLabel>
                 <div className="mt-4 flex flex-col gap-2.5">
                   {model.relatedSecondary.map((item) => (
                     <Link

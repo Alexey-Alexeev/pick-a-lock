@@ -14,7 +14,7 @@ import Link from "next/link";
 function ListBlock({ label, items }: { label: string; items: string[] }) {
   return (
     <div>
-      <TechnicalLabel>{label}</TechnicalLabel>
+      <TechnicalLabel as="h2">{label}</TechnicalLabel>
       <ul className="mt-4 flex flex-col">
         {items.map((item, i) => (
           <li key={i} className="border-b border-border py-3.5 text-sm leading-relaxed text-foreground first:border-t sm:text-[16px]">
@@ -95,7 +95,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
           <section className="grid grid-cols-1 gap-10 border-t border-border py-16 sm:py-20 lg:grid-cols-2 lg:gap-16">
             {relevantLockTypes.length > 0 && (
               <div>
-                <TechnicalLabel>Типы замков</TechnicalLabel>
+                <TechnicalLabel as="h2">Типы замков</TechnicalLabel>
                 <p className="mt-4 text-sm leading-relaxed text-foreground sm:text-[16px]">
                   {relevantLockTypes.map((lt) => lt!.name).join(" · ")}
                 </p>
@@ -106,7 +106,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
             )}
             {service.objectTypes.length > 0 && (
               <div>
-                <TechnicalLabel>Выезжаем на объекты</TechnicalLabel>
+                <TechnicalLabel as="h2">Выезжаем на объекты</TechnicalLabel>
                 <p className="mt-4 text-sm leading-relaxed text-foreground sm:text-[16px]">
                   {service.objectTypes.join(" · ")}
                 </p>
@@ -117,7 +117,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
 
         {relevantBrands.length > 0 && (
           <section className="border-t border-border py-16 sm:py-20">
-            <TechnicalLabel>Бренды</TechnicalLabel>
+            <TechnicalLabel as="h2">Бренды</TechnicalLabel>
             <p className="mt-4 text-sm leading-relaxed text-foreground sm:text-[16px]">
               {relevantBrands.map((b) => b!.name).join(" · ")}
             </p>
@@ -129,7 +129,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
 
         {/* Process */}
         <section className="border-t border-border py-16 sm:py-20">
-          <TechnicalLabel>Как проходит работа</TechnicalLabel>
+          <TechnicalLabel as="h2">Как проходит работа</TechnicalLabel>
           <div className="mt-6">
             <Process steps={model.processSteps.map((description) => ({ description }))} />
           </div>
@@ -148,7 +148,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
 
         {/* FAQ */}
         <section className="border-t border-border py-16 sm:py-20">
-          <TechnicalLabel>Частые вопросы</TechnicalLabel>
+          <TechnicalLabel as="h2">Частые вопросы</TechnicalLabel>
           <div className="mt-6 max-w-2xl">
             <FaqDisclosure items={model.faq} />
           </div>
@@ -158,7 +158,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
         <section className="grid grid-cols-1 gap-10 border-t border-border py-16 sm:py-20 lg:grid-cols-2 lg:gap-16">
           {model.relatedServices.length > 0 && (
             <div>
-              <TechnicalLabel>Другие услуги в {city.prepositionalName}</TechnicalLabel>
+              <TechnicalLabel as="h2">Другие услуги в {city.prepositionalName}</TechnicalLabel>
               <div className="mt-4 flex flex-col gap-2.5">
                 {model.relatedServices.map((s) => (
                   <Link
@@ -174,7 +174,7 @@ export function CityServiceTemplate({ model }: { model: CityServicePageModel }) 
           )}
           {model.nearbyCities.length > 0 && (
             <div>
-              <TechnicalLabel>{model.displayName} рядом</TechnicalLabel>
+              <TechnicalLabel as="h2">{model.displayName} рядом</TechnicalLabel>
               <div className="mt-4 flex flex-col gap-2.5">
                 {model.nearbyCities.map((c) => (
                   <Link
