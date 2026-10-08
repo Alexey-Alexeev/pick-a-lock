@@ -54,9 +54,16 @@ jobs:
       # with no banner. --ipv4 forces v4 resolution (GitHub runners have no outbound IPv6 route),
       # --ssl-reqd upgrades the control connection to TLS right after connecting, and
       # --ftp-ssl-control is implied by --ssl-reqd but kept explicit for clarity.
+      # -v is temporary: GitHub's runner IP is getting a flat connect timeout on port 21 while
+      # Jino support's own test connects and completes TLS fine. Need the resolved IP + the
+      # runner's outbound IP in the log to hand back to support as evidence they're filtering
+      # cloud/datacenter source IPs.
       - name: Upload site.zip over FTPS
         run: |
-          curl --fail --silent --show-error \
+          echo "Runner outbound IP:"
+          curl -s https://api.ipify.org
+          echo
+          curl --fail --show-error -v \
             --ipv4 --ssl-reqd --ftp-ssl-control \
             --connect-timeout 30 --max-time 900 --retry 2 --retry-delay 10 \
             --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
