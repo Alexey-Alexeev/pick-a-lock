@@ -94,7 +94,9 @@ export function getAllCities(): City[] {
 }
 
 export function getActiveCities(): City[] {
-  return getAllCities().filter((c) => c.isActive);
+  const cities = getAllCities().filter((c) => c.isActive);
+  // Moscow leads every city list/select across the site — it's the primary market.
+  return cities.sort((a, b) => (a.slug === "moscow" ? -1 : b.slug === "moscow" ? 1 : 0));
 }
 
 export function getCity(slug: string): City | undefined {
