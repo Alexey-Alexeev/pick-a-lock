@@ -45,9 +45,14 @@ export function TypewriterLine({ phrases, className }: TypewriterLineProps) {
   }
 
   return (
-    <span className={cn(className, "inline-flex items-center")}>
-      {text}
-      <span aria-hidden="true" className="ml-0.5 inline-block h-[1em] w-px animate-pulse bg-current align-middle" />
-    </span>
+    <>
+      {/* All phrases, present in the static HTML for crawlers and screen readers — the
+          animated version below is decorative and hidden from both. */}
+      <span className={cn(className, "sr-only")}>{phrases.join(" / ")}</span>
+      <span aria-hidden="true" className={cn(className, "inline-flex items-center")}>
+        {text}
+        <span className="ml-0.5 inline-block h-[1em] w-px animate-pulse bg-current align-middle" />
+      </span>
+    </>
   );
 }
