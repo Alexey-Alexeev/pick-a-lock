@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Script from "next/script";
 import { useCookieConsent } from "@/lib/cookieConsent";
 
@@ -11,6 +13,26 @@ export function AnalyticsScripts() {
   const ymId = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
+  // next/link navigates without a full page reload, so Metrika's own pageview-on-load never
+  // fires for anything but the first page of a visit. Resend a hit on every route change instead.
+  const pathname = usePathname();
+  const previousUrl = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (consent !== "accepted" || !ymId || typeof window.ym !== "function") return;
+    const url = window.location.href;
+    if (previousUrl.current === null) {
+      // First render already gets a hit from ym("init", ...) below — just record the URL.
+      previousUrl.current = url;
+      return;
+    }
+    if (previousUrl.current === url) return;
+    window.ym(Number(ymId), "hit", url, { referer: previousUrl.current });
+    previousUrl.current = url;
+    // pathname alone doesn't catch query-string-only changes, but this site has none that
+    // matter for analytics (UTM params are captured separately, see lib/analytics.ts).
+  }, [consent, ymId, pathname]);
+
   if (consent !== "accepted") return null;
 
   return (
@@ -19,9 +41,20 @@ export function AnalyticsScripts() {
         <Script id="yandex-metrika" strategy="afterInteractive">
           {`
             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-            ym(${ymId}, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true });
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=${ymId}", "ym");
+            ym(${ymId}, "init", {
+              ssr: true,
+              webvisor: true,
+              clickmap: true,
+              ecommerce: "dataLayer",
+              referrer: document.referrer,
+              url: location.href,
+              accurateTrackBounce: true,
+              trackLinks: true
+            });
             window.__YM_COUNTER_ID__ = ${ymId};
           `}
         </Script>
