@@ -21,7 +21,9 @@ export async function Header() {
   const brands = getIndexableBrands();
   const cities = getActiveCities()
     .map((c) => ({ slug: c.slug, name: c.name }))
-    .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+    .sort((a, b) =>
+      a.slug === "moscow" ? -1 : b.slug === "moscow" ? 1 : a.name.localeCompare(b.name, "ru")
+    );
 
   const groups: MegaMenuGroup[] = [
     {
