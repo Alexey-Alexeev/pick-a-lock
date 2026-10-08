@@ -940,7 +940,7 @@ export function HomeTemplate({ city, heroLocation }: HomeTemplateProps) {
         {/* Text */}
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-2.5 px-6 py-6 text-center sm:gap-5 sm:px-10 sm:py-14 lg:order-1 lg:w-[58%] lg:gap-6 lg:px-10 lg:py-16 xl:px-16 xl:pl-20">
           <p className="hero-rise flex min-h-[1.4em] items-center justify-center font-mono text-[13px] text-accent-ink [--hero-rise-delay:0ms] sm:min-h-[1.6em] sm:text-[15px]">
-            <TypewriterLine phrases={["Работаю круглосуточно", "Приеду за 30 минут", "Вскрою замок от 10 минут"]} />
+            <TypewriterLine phrases={["Работаю круглосуточно", "Приеду за 30 минут", "Вскрою замок от 10 минут", "Квартиры, сейфы, машины, гаражи, двери",  "Любой замок", "Выезд от 3000 рублей"]} />
           </p>
           {/* Visually the display headline, but kept as a <p> — the SEO-targeted sentence below carries the <h1>. */}
           <p className="hero-rise font-display text-[1.95rem] font-light leading-[0.95] tracking-[-0.03em] text-ink-foreground [--hero-rise-delay:150ms] [hyphens:none] [text-wrap:balance] min-[400px]:text-[2.3rem] sm:text-[3.4rem] lg:text-[3.3rem] xl:text-[4.2rem] 2xl:text-[4.8rem]">
